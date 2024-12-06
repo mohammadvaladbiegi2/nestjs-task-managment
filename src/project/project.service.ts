@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { SuccessesResponsType } from 'types/succssesResponse.type';
+import { ProjectStatus } from './enums/projectStatus.enum';
+import { query } from 'express';
 
 @Injectable()
 export class ProjectService {
@@ -30,21 +32,22 @@ export class ProjectService {
 
   }
 
-  async findAll(): Promise<Project[] | Error> {
-    const projects = await this.projectRepository.find()
+  async findprojects(status?: ProjectStatus, limit: number = 5, page: number = 1): Promise<Project[] | Error> {
+    const projects = await this.projectRepository.createQueryBuilder('project')
 
-    if (!projects.length) {
-      throw new NotFoundException('No projects found.')
+    if (status) {
+      projects.where('status = :status', { status }) // filter whit status
     }
 
-    return projects
+    projects.skip((page - 1) * limit).take(limit) // pagenations
+    return projects.getMany()
   }
 
   async findOne(id: number): Promise<Project | Error> {
     const user = await this.projectRepository.findOne({ where: { id } })
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Project not found');
     }
 
     return user
