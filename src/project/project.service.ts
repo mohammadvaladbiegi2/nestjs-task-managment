@@ -38,14 +38,23 @@ export class ProjectService {
   }
 
   async findOne(id: number): Promise<Project | Error> {
-    const project = await this.projectRepository.findOneBy({ id })
+    try {
+      const project = await this.projectRepository.findOne({
+        where: { id },
+        relations: ['tasks'],
+      });
 
-    if (!project) {
-      throw new NotFoundException('Project not found');
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+
+      return project;
+    } catch (error) {
+
+      throw new BadRequestException('Failed to retrieve project details');
     }
-
-    return project
   }
+
 
   async update(id: number, updateProjectDto: UpdateProjectDto): Promise<string | Error> {
     const project = await this.projectRepository.findOneBy({ id })

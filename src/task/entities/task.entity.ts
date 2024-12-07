@@ -11,7 +11,7 @@ export class Task {
     title: string
 
     @Column()
-    describtions: string
+    descriptions: string
 
     @Column({ type: 'enum', enum: TaskstatusEnum, default: TaskstatusEnum.Set })
     status: TaskstatusEnum
