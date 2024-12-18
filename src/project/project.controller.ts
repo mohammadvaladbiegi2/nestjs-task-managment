@@ -4,6 +4,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectStatus } from './enums/projectStatus.enum';
 import { Response } from 'express';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('project')
 export class ProjectController {
@@ -20,6 +21,60 @@ export class ProjectController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Fetch all project from server',
+    description: 'also you can filter whit set status and have pagnations and you can set your limit and page'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful response with project data.',
+    schema: {
+      example: {
+        data: [
+          {
+            id: 1,
+            title: 'Project Title',
+            status: 'enable',
+          },
+          {
+            id: 2,
+            title: 'Project Title',
+            status: 'disable',
+          },
+        ],
+        message: 'Projects Found',
+        statusCode: 200,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'still have not project yet',
+    schema: {
+      example: {
+        data: [],
+        message: 'still have not project yet',
+        statusCode: 404,
+      }
+    }
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ProjectStatus,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: 'number',
+    example: 5
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: 'number',
+    example: 1
+  })
   async findProjects(
     @Res() res: Response,
     @Query('status') status?: ProjectStatus,
